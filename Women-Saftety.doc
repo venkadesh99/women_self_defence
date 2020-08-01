@@ -1,0 +1,77 @@
+
+int PIN1 = 2;
+int PIN2 = 0;
+int PIN3 = 4;
+int PIN4 = 5;
+int ADCPIN = A0;
+
+int counter = 0;
+int laststate = 0;
+unsigned long endtime = 0;
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  pinMode(PIN1, INPUT);
+  pinMode(PIN2, INPUT);
+  pinMode(ADCPIN, INPUT);
+  pinMode(PIN3, OUTPUT);
+  pinMode(PIN4, OUTPUT);
+
+  //attachInterrupt(digitalPinToInterrupt(PIN1), IntCallback, CHANGE);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  unsigned long starttime = 0;
+  int val1 = 0 ; //digitalRead(PIN1);
+  int val2 = digitalRead(PIN2);
+  int val3 = analogRead(ADCPIN);
+
+  if( val3 > 250 || val1 == 1 )
+  {
+    digitalWrite(PIN3, HIGH);
+    digitalWrite(PIN4, HIGH);
+  }
+
+  if( laststate != val2 )
+  {
+      ++counter;
+      laststate = val2;
+  }
+
+  starttime  = millis();
+
+  if( endtime == 0 ||  (starttime - endtime ) > 10000 )
+  {
+     if( counter > 10 )
+     {
+        digitalWrite(PIN3, HIGH);
+        digitalWrite(PIN4, HIGH);
+     }
+     endtime = starttime;
+     counter = 0;
+  }
+  
+
+  Serial.print( val1 );
+  Serial.print( "/");
+  Serial.print( val2 );
+  Serial.print( "/");
+  Serial.print( val3 );
+  Serial.print( " ");
+  Serial.println( " ");
+  Serial.print( starttime );
+  Serial.print( "/");
+  Serial.print( endtime );
+  Serial.print( "/");
+  Serial.print( counter );
+  Serial.print( " ");
+  Serial.println( " ");
+
+  //delay(200);
+}
+
+void IntCallback(){
+ ++counter;
+}
